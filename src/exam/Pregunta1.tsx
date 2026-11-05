@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 /*
  * PREGUNTA 1 — Cronómetro | ~15 minutos
@@ -18,24 +18,41 @@ export default function Pregunta1() {
 
   // TODO 1: ¿Por qué usamos useRef para el ID del intervalo en lugar de useState?
   //         Escribe tu respuesta en un comentario debajo.
+  // El ID del intervalo no se pinta en pantalla, solo lo necesitamos para poder
+  // limpiarlo después. Con useRef el valor se mantiene entre renders y cambiarlo
+  // no provoca un re-render. Con useState cada asignación renderizaría de nuevo
+  // sin necesidad, y además el valor se actualiza de forma asíncrona, así que
+  // un handler podría leer un ID viejo y dejar un intervalo vivo.
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
+  const limpiarIntervalo = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
+    }
+  }
+
+  useEffect(() => limpiarIntervalo, [])
+
   const handleStart = () => {
-    if (corriendo) return
+    if (corriendo || intervalRef.current) return
     // TODO 2: Crea un setInterval que se ejecute cada 100ms.
     //         Dentro del callback, incrementa `tiempo` en 100.
     //         Guarda el ID que devuelve setInterval en intervalRef.current.
+    intervalRef.current = setInterval(() => {
+      setTiempo(prev => prev + 100)
+    }, 100)
     setCorriendo(true)
   }
 
   const handleStop = () => {
-    if (intervalRef.current) clearInterval(intervalRef.current)
+    limpiarIntervalo()
     // TODO 3: Actualiza el estado para reflejar que el cronómetro está detenido.
     setCorriendo(false)
   }
 
   const handleReset = () => {
-    if (intervalRef.current) clearInterval(intervalRef.current)
+    limpiarIntervalo()
     // TODO 4: Reinicia tiempo a 0 y el estado de corriendo.
     setTiempo(0)
     setCorriendo(false)
