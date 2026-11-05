@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 /*
  * PREGUNTA 1 — Cronómetro | ~15 minutos
@@ -18,27 +18,41 @@ export default function Pregunta1() {
 
   // TODO 1: ¿Por qué usamos useRef para el ID del intervalo en lugar de useState?
   //         Escribe tu respuesta en un comentario debajo.
+  // Porque el ID no se muestra en pantalla, solo lo necesitamos para poder detener el intervalo.
+  // Con useRef lo guardamos sin que el componente se vuelva a renderizar; con useState si pasaria.
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  // Para evitar memory leaks: si el componente se desmonta, detenemos el intervalo.
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
+  }, [])
 
   const handleStart = () => {
     if (corriendo) return
     // TODO 2: Crea un setInterval que se ejecute cada 100ms.
     //         Dentro del callback, incrementa `tiempo` en 100.
     //         Guarda el ID que devuelve setInterval en intervalRef.current.
+    intervalRef.current = setInterval(() => {
+      setTiempo(prev => prev + 100)
+    }, 100)
     setCorriendo(true)
   }
 
   const handleStop = () => {
     if (intervalRef.current) clearInterval(intervalRef.current)
     // TODO 3: Actualiza el estado para reflejar que el cronómetro está detenido.
-    setCorriendo(false)
+    // Este punto ya venia resuelto.
+    setCorriendo(false);
   }
 
   const handleReset = () => {
     if (intervalRef.current) clearInterval(intervalRef.current)
     // TODO 4: Reinicia tiempo a 0 y el estado de corriendo.
-    setTiempo(0)
-    setCorriendo(false)
+    // Este tambien ya venia resuelto.
+    setTiempo(0);
+    setCorriendo(false);
   }
 
   return (

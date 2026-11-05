@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 // TODO: cuando implementes useMemo, agrégalo al import de arriba
 
 /*
@@ -26,15 +26,18 @@ export default function Pregunta2() {
   // TODO 1: Reemplaza esta asignación con useMemo.
   //         Calcula el resultado según la unidad seleccionada.
   //         Define el array de dependencias: ¿cuándo debe recalcularse?
-  const resultado = unidad === 'F'
-    ? (celsius * 9) / 5 + 32
-    : celsius + 273.15
+  // Solo cuando cambia `celsius` o `unidad`, porque son los unicos datos que usa el calculo.
+  const resultado = useMemo(
+    () => (unidad === 'F' ? (celsius * 9) / 5 + 32 : celsius + 273.15),
+    [celsius, unidad],
+  )
 
   // TODO 2: Implementa el cuerpo de este useEffect para actualizar document.title.
   //         Formato sugerido: `${celsius}°C = ${resultado.toFixed(2)}°${unidad}`
   useEffect(() => {
     // escribe aquí
-  }, [])
+    document.title = `${celsius}°C = ${resultado.toFixed(2)}°${unidad}`
+  }, [celsius, resultado, unidad])
 
   return (
     <div style={{ padding: '2rem', maxWidth: 400, margin: '0 auto' }}>
